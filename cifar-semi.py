@@ -220,7 +220,7 @@ def train(net, optimizer, scheduler, trainloader, unlabeled_trainloder, testload
         # loss
         loss_xe = cross_entropy(input=logits_x, target=l_x)
         loss_l2u = nn.functional.mse_loss(nn.functional.softmax(logits_y, dim=-1), l_y.reshape(nu * bs, args.num_class))
-        w_match = 100 * min(1, step / 8192.0)
+        w_match = 100 * min(1, step / 16384)
         loss = loss_xe + w_match * loss_l2u
 
         prec1, = accuracy(logits_x, l_in)
@@ -318,7 +318,7 @@ if __name__ == '__main__':
                         help='only training last fc layer')
     parser.add_argument('-j', '--num-workers', default=2, type=int,
                         metavar='N', help='number of workers to load data')
-    parser.add_argument('-b', '--batch-size', default=128, type=int,
+    parser.add_argument('-b', '--batch-size', default=64, type=int,
                         metavar='N', help='batch size')
     parser.add_argument('--max-iters', default=500000, type=int,
                         metavar='N', help='number of iterations')

@@ -333,3 +333,4 @@ ASALocalRun/
 checkpoint/
 data/
 tensorboard/
+*.swp
