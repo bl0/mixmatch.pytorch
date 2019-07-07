@@ -89,7 +89,6 @@ def build_model(args):
 
 def validate(val_loader, model, device='cpu', print_freq=100, prefix='test'):
     batch_time = AverageMeter()
-    losses = AverageMeter()
     top1 = AverageMeter()
 
     # switch to evaluate mode
@@ -114,7 +113,6 @@ def validate(val_loader, model, device='cpu', print_freq=100, prefix='test'):
             if i % print_freq == 0:
                 print(f'{prefix}: [{i}/{len(val_loader)}] '
                       f'Time {batch_time.val:.3f} ({batch_time.avg:.3f}) '
-                      f'Loss {losses.val:.4f} ({losses.avg:.4f}) '
                       f'Prec@1 {top1.val:.3f} ({top1.avg:.3f})')
 
         print(f' * {prefix} Prec@1 {top1.avg:.3f}')
@@ -216,7 +214,7 @@ def train(net, ema_net, optimizer, ema_optimizer, trainloader, unlabeled_trainlo
             val_ema_acc = get_acc(testloader, ema_net, prefix='val_ema')
             writer.add_scalar('top1/val_ema', val_ema_acc, log_step)
 
-
+            global best_acc
             if val_ema_acc > best_acc:
                 best_acc = val_ema_acc
                 state = {
@@ -238,7 +236,7 @@ def main(args):
     net, ema_net, optimizer, ema_optimizer = build_model(args)
 
     if args.eval:
-        validate(testloader, net, device=args.device, print_freq=args.print_freq)
+        return validate(testloader, net, device=args.device, print_freq=args.print_freq)
 
     # summary writer
     os.makedirs(args.log_dir, exist_ok=True)
