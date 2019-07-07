@@ -131,8 +131,9 @@ def train(net, ema_net, optimizer, ema_optimizer, trainloader, unlabeled_trainlo
             for data in zip(trainloader, unlabeled_trainloder):
                 yield data
 
-    for step in range(args.start_step, args.max_iters):
-        (x_in, l_in), y_in = next(inf_generator())
+    for step, ((x_in, l_in), y_in) in enumerate(inf_generator(), start=args.start_step):
+        if step >= args.max_iters:
+            break
         data_time = time.time() - end
 
         with torch.no_grad():
