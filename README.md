@@ -16,4 +16,4 @@ Tensorboard log on cifar10 dataset with 250 labeled data.
 
 ## Notes
 
-This repo borrow some code from https://github.com/google-research/mixmatch and https://github.com/YU1ut/MixMatch-pytorch. 
+Some codes is borrowed from https://github.com/google-research/mixmatch and https://github.com/YU1ut/MixMatch-pytorch. 
