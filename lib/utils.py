@@ -1,10 +1,6 @@
-import math
-
 import torch
-import torch.nn as nn
-from torch.optim.lr_scheduler import CosineAnnealingLR
 
-from lib.models import WideResNet
+from lib.wideresnet import WideResNet
 
 
 # noinspection PyAttributeOutsideInit
@@ -27,28 +23,6 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-class CosineAnnealingLRWithRestart(CosineAnnealingLR):
-    """Adjust learning rate"""
-
-    def __init__(self, optimizer, eta_min=0, lr_t_0=10, lr_t_mul=2, last_epoch=-1):
-        self.eta_min = eta_min
-        self.lr_t_curr = lr_t_0
-        self.lr_t_mul = lr_t_mul
-        self.last_reset = 0
-        super(CosineAnnealingLRWithRestart, self).__init__(optimizer, last_epoch)
-
-    def get_lr(self):
-        curr_epoch = self.last_epoch - self.last_reset
-        if curr_epoch >= self.lr_t_curr:
-            self.lr_t_curr *= self.lr_t_mul
-            self.last_reset = self.last_epoch
-            rate = 0
-        else:
-            rate = curr_epoch * math.pi / self.lr_t_curr
-        return [self.eta_min + 0.5 * (base_lr - self.eta_min) * (1.0 + math.cos(rate))
-                for base_lr in self.base_lrs]
-
-
 def accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
     with torch.no_grad():
@@ -66,32 +40,7 @@ def accuracy(output, target, topk=(1,)):
         return res
 
 
-def cross_entropy(input, target, size_average=True):
-    """ Cross entropy that accepts soft targets
-    Args:
-         input: predictions for neural network
-         target: targets, can be soft
-         size_average: if false, sum is returned instead of mean
-
-    Examples::
-
-        input = torch.FloatTensor([[1.1, 2.8, 1.3], [1.1, 2.1, 4.8]])
-        input = torch.autograd.Variable(out, requires_grad=True)
-
-        target = torch.FloatTensor([[0.05, 0.9, 0.05], [0.05, 0.05, 0.9]])
-        target = torch.autograd.Variable(y1)
-        loss = cross_entropy(input, target)
-        loss.backward()
-    """
-    losses = torch.sum(-target * nn.LogSoftmax(dim=1)(input), dim=1)
-    if size_average:
-        return torch.mean(losses)
-    else:
-        return torch.sum(losses)
-
-
 def guess_label(ys, net, T=0.5):
-    # net = net.eval()
     logits = net(torch.cat(ys, dim=0))
 
     p = torch.nn.functional.softmax(

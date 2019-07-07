@@ -1,4 +1,3 @@
-from __future__ import print_function
 from PIL import Image
 import torchvision.datasets as datasets
 import torch.utils.data as data
@@ -9,7 +8,6 @@ import numpy as np
 class UnlabeledCIFAR10(datasets.CIFAR10):
 
     def __init__(self, indexes, nu=2, **kwargs):
-
         super(UnlabeledCIFAR10, self).__init__(**kwargs)
         assert self.train
         self.indexes = indexes.cpu().numpy().copy()
@@ -30,6 +28,7 @@ class UnlabeledCIFAR10(datasets.CIFAR10):
         imgs = [self.transform(img) for _ in range(self.nu)]
 
         return imgs
+
 
 class PseudoCIFAR10(datasets.CIFAR10):
     """CIFAR10Instance Dataset.
@@ -75,7 +74,6 @@ if __name__ == '__main__':
     import torchvision.transforms as transforms
 
     _labeled_indexes = torch.arange(10)
-
 
     transform_train = transforms.Compose([
         transforms.ToTensor(),
